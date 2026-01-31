@@ -1,0 +1,90 @@
+<DOCTYPE>
+<html>
+<head>
+<!--THIS IS A COMMENT-->
+<title>WebGame</title>
+
+<style>
+body{
+    margin: 0;
+    background-color: black;
+    overflow: hidden;
+}
+
+#Instructions{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    pointer-events: none;
+    z-index: 10;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="Instructions">Use WASD to move the character</div>
+<script type="module">
+    //This imports the three.js library into our html file
+    import * as THREE from '../three.js-r182/build/three.module.js';
+
+    //Scene Setup
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x111111);
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({antialias: true});
+    document.body.appendChild(renderer.domElement);
+
+    // Visual settings
+    const grid = new THREE.GridHelper(20, 20, 0x00ff88, 0x444444);
+    scene.add(grid);
+
+    //Character
+    const character = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        new THREE.MeshNormalMaterial()
+    );
+
+    character.position.y = 0.5;
+    scene.add(character);
+
+    camera.position.set(0,5,10);
+    camera.lookAt(character.position);
+
+    //Movement Logic
+    const keys = {};
+    window.addEventListener('keydown',(e)=> keys[e.code] = true);
+    window.addEventListener('keyup',(e)=> keys[e.code] = false);
+
+
+    function animation(){
+        requestAnimationFrame(animation);
+
+        const speed = 0.1;
+        if(keys['KeyW']) character.position.z -= speed;
+        if(keys['KeyS']) character.position.z += speed;
+        if(keys['KeyA']) character.position.x -= speed;
+        if(keys['KeyD']) character.position.x += speed;
+
+        camera.position.x = character.position.x;
+        camera.position.z = character.position.z + 10;
+        camera.lookAt(character.position);
+
+        renderer.render(scene, camera);
+    }
+
+    animation();
+
+    window.addEventListener('resize', ()=> {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    })
+</script>
+</body>
+
+</html>
